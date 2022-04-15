@@ -46,9 +46,9 @@ class ReflexAgent(Agent):
         bestScore = max(scores)
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
         chosenIndex = random.choice(bestIndices) # Pick randomly among the best
+        
 
         "Add more of your code here if you want to"
-
         return legalMoves[chosenIndex]
 
     def evaluationFunction(self, currentGameState, action):
@@ -74,8 +74,6 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-
-        score = 0
         #Meet Ghost
         GhostPositions = [Ghost.getPosition() for Ghost in newGhostStates]
         index = 0
@@ -87,6 +85,7 @@ class ReflexAgent(Agent):
                 print("Escape from the Ghost!!")
                 return -9999
             index = index +1
+
         #find nearest food'
         curFood = currentGameState.getFood()
         near = 9999
@@ -131,7 +130,20 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
     Your minimax agent (question 2)
     """
-
+    def Ghost(self, gameState, curDepth, agentIndex):
+        v = scoreEvaluationFunction(gameState)
+        actions = gameState.getLegalActions(agentIndex)
+        newStates = [state.getSuccessor(action) for action in actions]
+        for state in newStates:
+            v = min(v, Pacman(state, curDepth + 1))
+        return v
+    def Pacman(self, gameState, curDepth):
+        v = -9999
+        GhostStates = gameState.getGhostStates()
+        GhostNum = len(GhostStates)
+        GhostActions = [actions for actions in gameState.getLegalActions(i) for i in range(1, GhostNum) ]
+        for ghost in range(1,GhostNum):
+            
     def getAction(self, gameState):
         """
         Returns the minimax action from the current gameState using self.depth
