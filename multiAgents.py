@@ -84,18 +84,17 @@ class ReflexAgent(Agent):
                 if newScaredTimes[index] > 0:
                     print("Kill the Ghost!!")
                     return 9999
-                print("Escape from Ghost!!")
+                print("Escape from the Ghost!!")
                 return -9999
             index = index +1
-        #find nearest food
+        #find nearest food'
+        curFood = currentGameState.getFood()
         near = 9999
-        for i in range(newFood.width):
-            for j in range(newFood.height):
-                if newFood[i][j] and util.manhattanDistance((i, j), newPos) < near:
+        for i in range(curFood.width):
+            for j in range(curFood.height):
+                if curFood[i][j] and util.manhattanDistance((i, j), newPos) < near:
                     near = util.manhattanDistance((i, j), newPos)
-                    #print("(i, j) = ",i,j,"near = ",near)
                     if near == 0: break
-        print(-near,"\n")
         return -near
 
 def scoreEvaluationFunction(currentGameState):
