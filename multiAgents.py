@@ -80,10 +80,7 @@ class ReflexAgent(Agent):
         index = 0
         for GhostPos in GhostPositions:
             if util.manhattanDistance(GhostPos, newPos) <= 1:
-                if newScaredTimes[index] > 0:
-                    print("Kill the Ghost!!")
-                    return 9999
-                print("Escape from the Ghost!!")
+                if newScaredTimes[index] > 0: return 9999
                 return -9999
             index = index +1
         #find nearest food'
@@ -130,6 +127,47 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
     Your minimax agent (question 2)
     """
+    def pacmanTurn(self, gameState, curDepth):
+        print("pacmanTurn\ndepth = ", curDepth)
+        actions = gameState.getLegalActions(0)
+        print("actions = ", actions)
+        #actions가 비었다는 것은 terminal-node라는 것
+        if(not len(actions)): return self.evaluationFunction(gameState)
+        v = -99999
+        tmp = v
+        for action in actions:
+            succ = gameState.generateSuccessor(0, action)
+            print("is win =",succ.isWin())
+            if succ.isWin():
+                tmp = self.evaluationFunction(succ)
+            else:
+                tmp = self.ghostTurn(succ, curDepth + 1, 1)
+            print("v = ", v,"tmp = ",tmp)
+            v = max(v, tmp)
+        print("t")
+        return v
+
+    def ghostTurn(self, gameState, curDepth, agentID):
+        print("ghostTurn\ndepth =", curDepth)
+        ghostEndNum = gameState.getNumAgents()
+        actions = gameState.getLegalActions(agentID)
+        v = 99999
+        tmp = v
+        for action in actions:
+            succ = gameState.generateSuccessor(agentID, action)
+            if succ.isLose():
+                tmp = self.evaluationFunction(succ)
+            else:
+                if agentID == ghostEndNum:
+                    #end point
+                    if curDepth == self.depth: return self.evaluationFunction(succ)
+                    tmp = self.pacmanTurn(succ, curDepth + 1)
+                else:
+                    tmp = self.ghostTurn(succ, curDepth + 1, agentID + 1)
+            print("v = ", v,"tmp = ", tmp)
+            v = min(v, tmp)
+        print("t")
+        return v
 
     def getAction(self, gameState):
         """
@@ -155,7 +193,21 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        actions = gameState.getLegalActions(0)
+        print("first actions = ",actions)
+        bestAction = actions[0]
+        v = -99999
+        for action in actions:
+            print("first action", action)
+            succ = gameState.generateSuccessor(0, action)
+            print("win or lose = ", succ.isWin(), succ.isLose())
+            tmp = self.pacmanTurn(succ, 1)
+            print("v = ",v,"tmp = ",tmp)
+            if tmp > v:
+                v = tmp
+                bestAction = action
+                print("bestAction = ",bestAction)
+        return bestAction
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
