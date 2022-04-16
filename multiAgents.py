@@ -68,35 +68,33 @@ class ReflexAgent(Agent):
         """
         # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
-        newPos = successorGameState.getPacmanPosition() #ÀÌµ¿ÇÑ À§Ä¡ÀÇ ÁÂÇ¥
-        newFood = successorGameState.getFood() #¸Ê ÀüÃ¼¿¡ ÀÖ´Â ¸ÔÀÌÀÇ À§Ä¡ T/F
-        newGhostStates = successorGameState.getGhostStates() #ghostµéÀÇ À§Ä¡. [(x, y), (x2, y2) ... ]
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates] #°¢ ghostµéÀÇ scared time ÀÜ¿©·® [ghost1ÀÇ ÀÜ¿©·®, ghost 2ÀÇ ÀÜ¿©·® ...]
+        newPos = successorGameState.getPacmanPosition() #ì´ë™í•œ ìœ„ì¹˜ì˜ ì¢Œí‘œ
+        newFood = successorGameState.getFood() #ë§µ ì „ì²´ì— ìžˆëŠ” ë¨¹ì´ì˜ ìœ„ì¹˜ T/F
+        newGhostStates = successorGameState.getGhostStates() #ghostë“¤ì˜ ìœ„ì¹˜. [(x, y), (x2, y2) ... ]
+        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates] #ê° ghostë“¤ì˜ scared time ìž”ì—¬ëŸ‰ [ghost1ì˜ ìž”ì—¬ëŸ‰, ghost 2ì˜ ìž”ì—¬ëŸ‰ ...]
 
         "*** YOUR CODE HERE ***"
-        total = 0
-        
+        score = 0
+        #Meet Ghost
         GhostPositions = [Ghost.getPosition() for Ghost in newGhostStates]
-        metGhost = False
-        print(newFood, newPos)
-        print(newFood[newPos[0]][newPos[1]])
-        if newFood[newPos[0]][newPos[1]]:
-            total = total + 1
-            #print("find Food!!\n")
+        index = 0
         for GhostPos in GhostPositions:
-            if newPos == GhostPos:
-                GhostIndex= GhostPositions.index(GhostPos)
-                metGhost = True
-                break
-        if metGhost:
-            #print("met Ghost@@@@@@@@@@@@@@@@@@ \n")
-            if newScaredTimes[GhostIndex] > 0: total = total + 10
-            else: total = -10
-        actions = successorGameState.getLegalActions()
-        print(total)
-
-
-        return total
+            if util.manhattanDistance(GhostPos, newPos) <= 1:
+                if newScaredTimes[index] > 0:
+                    print("Kill the Ghost!!")
+                    return 9999
+                print("Escape from the Ghost!!")
+                return -9999
+            index = index +1
+        #find nearest food'
+        curFood = currentGameState.getFood()
+        near = 9999
+        for i in range(curFood.width):
+            for j in range(curFood.height):
+                if curFood[i][j] and util.manhattanDistance((i, j), newPos) < near:
+                    near = util.manhattanDistance((i, j), newPos)
+                    if near == 0: break
+        return -near
 
 def scoreEvaluationFunction(currentGameState):
     """
