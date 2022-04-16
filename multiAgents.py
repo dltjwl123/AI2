@@ -68,13 +68,12 @@ class ReflexAgent(Agent):
         """
         # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
-        newPos = successorGameState.getPacmanPosition()
-        newFood = successorGameState.getFood()
-        newGhostStates = successorGameState.getGhostStates()
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+        newPos = successorGameState.getPacmanPosition() #이동한 위치의 좌표
+        newFood = successorGameState.getFood() #맵 전체에 있는 먹이의 위치 T/F
+        newGhostStates = successorGameState.getGhostStates() #ghost들의 위치. [(x, y), (x2, y2) ... ]
+        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates] #각 ghost들의 scared time 잔여량 [ghost1의 잔여량, ghost 2의 잔여량 ...]
 
         "*** YOUR CODE HERE ***"
-
         score = 0
         #Meet Ghost
         GhostPositions = [Ghost.getPosition() for Ghost in newGhostStates]
