@@ -68,14 +68,35 @@ class ReflexAgent(Agent):
         """
         # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
-        newPos = successorGameState.getPacmanPosition()
-        newFood = successorGameState.getFood()
-        newGhostStates = successorGameState.getGhostStates()
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+        newPos = successorGameState.getPacmanPosition() #이동한 위치의 좌표
+        newFood = successorGameState.getFood() #맵 전체에 있는 먹이의 위치 T/F
+        newGhostStates = successorGameState.getGhostStates() #ghost들의 위치. [(x, y), (x2, y2) ... ]
+        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates] #각 ghost들의 scared time 잔여량 [ghost1의 잔여량, ghost 2의 잔여량 ...]
 
         "*** YOUR CODE HERE ***"
+        total = 0
+        
+        GhostPositions = [Ghost.getPosition() for Ghost in newGhostStates]
+        metGhost = False
+        print(newFood, newPos)
+        print(newFood[newPos[0]][newPos[1]])
+        if newFood[newPos[0]][newPos[1]]:
+            total = total + 1
+            #print("find Food!!\n")
+        for GhostPos in GhostPositions:
+            if newPos == GhostPos:
+                GhostIndex= GhostPositions.index(GhostPos)
+                metGhost = True
+                break
+        if metGhost:
+            #print("met Ghost@@@@@@@@@@@@@@@@@@ \n")
+            if newScaredTimes[GhostIndex] > 0: total = total + 10
+            else: total = -10
+        actions = successorGameState.getLegalActions()
+        print(total)
 
-        return successorGameState.getScore()
+
+        return total
 
 def scoreEvaluationFunction(currentGameState):
     """
