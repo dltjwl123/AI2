@@ -201,13 +201,62 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     """
     Your minimax agent with alpha-beta pruning (question 3)
     """
+    def pacmanTurn(self, gameState, curDepth, maximum, minimum):
+        actions = gameState.getLegalActions(0)
+        v = -99999
+        tmp = v
+        for action in actions:
+            succ = gameState.generateSuccessor(0, action)
+            if succ.isWin() or succ.isLose() or curDepth == self.depth:
+                tmp = self.evaluationFunction(succ)
+            else:
+                tmp = self.ghostTurn(succ, curDepth + 1, 1, maximum, minimum)
+            v = max(v, tmp)
+            if v > maximum: return v
+            minimum = max(minimum, v)
+        return v     
 
+    def ghostTurn(self, gameState, curDepth, agentID, maximum, minimum):
+        ghostEndNum = gameState.getNumAgents() - 1
+        actions = gameState.getLegalActions(agentID)
+        actions_pac = gameState.getLegalActions(0)
+        v = 99999
+        tmp = v
+        for action in actions:
+            succ = gameState.generateSuccessor(agentID, action)
+            if succ.isLose() or succ.isWin():
+                tmp = self.evaluationFunction(succ)
+            else:
+                if agentID == ghostEndNum:
+                    #end point
+                    if curDepth == self.depth: tmp = self.evaluationFunction(succ)
+                    else: tmp = self.pacmanTurn(succ, curDepth, maximum, minimum)
+                else:
+                    tmp = self.ghostTurn(succ, curDepth, agentID + 1, maximum, minimum)
+            v = min(v, tmp)
+            if v < minimum: return v
+            maximum = min(maximum, v)
+        return v
     def getAction(self, gameState):
         """
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        actions = gameState.getLegalActions(0)
+        bestAction = actions[0]
+        v = -99999
+        maximum = 99999
+        minimum = -99999
+        for action in actions:
+            succ = gameState.generateSuccessor(0, action)
+            if succ.isWin() or succ.isLose(): tmp = self.evaluationFunction(succ)
+            else:
+                tmp = self.ghostTurn(succ, 1, 1, maximum, minimum)
+            if tmp > v:
+                v = tmp
+                bestAction = action
+            minimum = max(minimum, v)
+        return bestAction
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
